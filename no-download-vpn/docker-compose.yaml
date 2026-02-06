@@ -66,6 +66,8 @@ services:
       - TZ=${TIMEZONE:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:bazarr
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_BAZARR}:6767"
     networks:
       - mediastack
     labels:
@@ -106,6 +108,7 @@ services:
       - CHROME_CLI=${CHROMIUM_START_PAGE:?err}
     ports:
       - ${WEBUI_PORT_CHROMIUM:?err}:${WEBUI_PORT_CHROMIUM:?err}
+      - "${WEBUI_PORT_CHROMIUM}:3650"
     networks:
       - mediastack
     labels:
@@ -139,6 +142,8 @@ services:
       - LOG_HTML=false
       - CAPTCHA_SOLVER=none
       - TZ=${TIMEZONE:?err}
+    ports:
+      - "${FLARESOLVERR_PORT}:8191"
     networks:
       - mediastack
     labels:
@@ -212,6 +217,8 @@ services:
       - PUID=${PUID:?err}
       - PGID=${PGID:?err}
       - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_HUNTARR}:9705"
     networks:
       - mediastack
     labels:
@@ -253,6 +260,9 @@ services:
       - PGID=${PGID:?err}
       - UMASK=${UMASK:?err}
       - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_JELLYFIN}:8096"
+      - "8920:8920"
 #      - JELLYFIN_PublishedServerUrl=${LOCAL_DOCKER_IP:?err}  # Enable for DLNA - Only works on HOST Network Mode
     networks:
       - mediastack
@@ -291,6 +301,8 @@ services:
       - PGID=${PGID:?err}
       - UMASK=${UMASK:?err}
       - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_JELLYSEERR}:5055"
     labels:
       - traefik.enable=true
     # ROUTERS
@@ -326,6 +338,8 @@ services:
       - TZ=${TIMEZONE:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:lidarr
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_LIDARR}:8686"
     networks:
       - mediastack
     labels:
@@ -371,6 +385,17 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
       - ADVERTISE_IP=https://plex.${CLOUDFLARE_DNS_ZONE:?err}:443/
+    ports:
+      - "${WEBUI_PORT_PLEX}:32400"
+      # optional extras
+      - "1900:1900/udp"
+      - "5353:5353/udp"
+      - "8324:8324"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "32469:32469"
     labels:
       - traefik.enable=true
     # ROUTERS
@@ -402,6 +427,7 @@ services:
       - ${FOLDER_FOR_DATA:?err}/portainer:/data
     ports:
       - ${WEBUI_PORT_PORTAINER:?err}:9000
+        - "9443:9443"
     networks:
       - mediastack
     labels:
@@ -438,6 +464,8 @@ services:
       - TZ=${TIMEZONE:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_PROWLARR}:9696"
     networks:
       - mediastack
     labels:
@@ -477,6 +505,10 @@ services:
       - WEBUI_PORT=${WEBUI_PORT_QBITTORRENT:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:qbittorrent
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_QBITTORRENT}:8080"
+      - "${QBIT_PORT}:6881"
+      - "${QBIT_PORT}:6881/udp
     networks:
       - mediastack
     labels:
@@ -514,6 +546,8 @@ services:
       - TZ=${TIMEZONE:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:radarr
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_RADARR}:7878"
     networks:
       - mediastack
     labels:
@@ -551,6 +585,8 @@ services:
       - TZ=${TIMEZONE:?err}
       - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:sonarr
       - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_SONARR}:8989"
     networks:
       - mediastack
     labels:
@@ -597,6 +633,9 @@ services:
       - webUIPort=${WEBUI_PORT_TDARR:?err}
       - internalNode=true
       - nodeID=Tdarr_Server
+    ports:
+      - "${WEBUI_PORT_TDARR}:8265"
+      - "${TDARR_SERVER_PORT}:8266"
     networks:
       - mediastack
     labels:
