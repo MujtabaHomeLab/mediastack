@@ -445,6 +445,79 @@ services:
 ###########################################################################
 ###########################################################################
 ##
+##  Docker Compose File: Overseerr (sabeas)
+##  Function: Request Management & Discovery (Plex focused)
+##
+##  Documentation: https://docs.overseerr.dev/getting-started/installation
+##
+###########################################################################
+###########################################################################
+  overseerr:
+    image: sct/overseerr:latest
+    container_name: overseerr
+    restart: unless-stopped
+    networks:
+      - mediastack
+    volumes:
+      - ${FOLDER_FOR_DATA:?err}/overseerr:/app/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+      - LOG_LEVEL=info
+    ports:
+      - "${WEBUI_PORT_OVERSEERR}:5055"
+    labels:
+      - traefik.enable=true
+    # ROUTERS
+      - traefik.http.routers.overseerr.service=overseerr
+      - traefik.http.routers.overseerr.rule=Host(`overseerr.${CLOUDFLARE_DNS_ZONE:?err}`)
+      - traefik.http.routers.overseerr.entrypoints=secureweb
+      - traefik.http.routers.overseerr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
+    # SERVICES
+      - traefik.http.services.overseerr.loadbalancer.server.scheme=http
+      - traefik.http.services.overseerr.loadbalancer.server.port=5055
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Prowlarr (LinuxServer.io)
+##  Function: Indexer and Search Manager
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-prowlarr
+##
+###########################################################################
+###########################################################################
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    volumes:
+      - ${FOLDER_FOR_DATA:?err}/prowlarr:/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
+      - TP_THEME=${TP_THEME:?err}
+    ports:
+      - "${WEBUI_PORT_PROWLARR}:9696"
+    networks:
+      - mediastack
+    labels:
+      - traefik.enable=true
+    # ROUTERS
+      - traefik.http.routers.prowlarr.service=prowlarr
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${CLOUDFLARE_DNS_ZONE:?err}`)
+      - traefik.http.routers.prowlarr.entrypoints=secureweb
+      - traefik.http.routers.prowlarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
+    # SERVICES
+      - traefik.http.services.prowlarr.loadbalancer.server.scheme=http
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+
+###########################################################################
+###########################################################################
+##
 ##  Docker Compose File: Unpackerr (Hotio.Dev)
 ##  Function: Archive Media Extraction
 ##
