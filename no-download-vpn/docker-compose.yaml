@@ -521,16 +521,6 @@ services:
       - UN_RADARR_0_DELETE_DELAY=5m
       - UN_RADARR_0_DELETE_ORIG=false
       - UN_RADARR_0_SYNCTHING=false
-      ## Lidarr Settings
-      ## Lidarr Config - Copy API Key from: http://lidarr:8686/general/settings
-      - UN_LIDARR_0_URL=http://lidarr:8686
-      - UN_LIDARR_0_API_KEY=0123456789abcdef0123456789abcdef
-      - UN_LIDARR_0_PATHS_0=/data/torrents/music
-      - UN_LIDARR_0_PROTOCOLS=torrent
-      - UN_LIDARR_0_TIMEOUT=10s
-      - UN_LIDARR_0_DELETE_DELAY=5m
-      - UN_LIDARR_0_DELETE_ORIG=false
-      - UN_LIDARR_0_SYNCTHING=false
       ## Watch Folders
       - UN_FOLDER_0_PATH=/data/torrents/complete
       - UN_FOLDER_0_EXTRACT_PATH=
