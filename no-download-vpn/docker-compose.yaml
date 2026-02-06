@@ -46,45 +46,6 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Bazarr (LinuxServer.io)
-##  Function: Download subtitles for Radarr and Sonarr
-##
-##  Documentation: https://docs.linuxserver.io/images/docker-bazarr
-##
-###########################################################################
-###########################################################################
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
-    container_name: bazarr
-    restart: unless-stopped
-    volumes:
-      - ${FOLDER_FOR_MEDIA:?err}:/data
-      - ${FOLDER_FOR_DATA:?err}/bazarr:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - TZ=${TIMEZONE:?err}
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:bazarr
-      - TP_THEME=${TP_THEME:?err}
-    ports:
-      - "${WEBUI_PORT_BAZARR}:6767"
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.bazarr.service=bazarr
-      - traefik.http.routers.bazarr.rule=Host(`bazarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.bazarr.entrypoints=secureweb
-      - traefik.http.routers.bazarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.bazarr.loadbalancer.server.scheme=http
-      - traefik.http.services.bazarr.loadbalancer.server.port=6767
-    # MIDDLEWARES
-    
-###########################################################################
-###########################################################################
-##
 ##  Docker Compose File: Flaresolverr (Flaresolverr)
 ##  Function: Cloudflare Proxy Server
 ##
@@ -115,81 +76,6 @@ services:
     # SERVICES
       - traefik.http.services.flaresolverr.loadbalancer.server.scheme=http
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
-##  Docker Compose File: Homarr (https://ghcr.io/)
-##  Function: Application Dashboard
-##
-##  Documentation: https://homarr.dev/docs/getting-started/after-the-installation
-##
-###########################################################################
-###########################################################################
-  homarr:
-    image: ghcr.io/ajnart/homarr:latest
-    container_name: homarr
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${FOLDER_FOR_DATA:?err}/homarr/configs:/app/data/configs
-      - ${FOLDER_FOR_DATA:?err}/homarr/icons:/app/public/icons
-      - ${FOLDER_FOR_DATA:?err}/homarr/data:/data
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - UMASK=${UMASK:?err}
-      - TZ=${TIMEZONE:?err}
-    ports:
-      - ${WEBUI_PORT_HOMARR:?err}:7575
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.homarr.service=homarr
-      - traefik.http.routers.homarr.rule=Host(`homarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.homarr.entrypoints=secureweb
-      - traefik.http.routers.homarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.homarr.loadbalancer.server.scheme=http
-      - traefik.http.services.homarr.loadbalancer.server.port=7575
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
-##  Docker Compose File: Huntarr
-##  Function: ARR Missing Content Manager
-##
-##  Documentation: https://github.com/plexguide/Huntarr.io
-##
-###########################################################################
-###########################################################################
-  huntarr:
-    image: huntarr/huntarr:latest
-    container_name: huntarr
-    volumes:
-      - ${FOLDER_FOR_DATA:?err}/huntarr:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - TZ=${TIMEZONE:?err}
-    ports:
-      - "${WEBUI_PORT_HUNTARR}:9705"
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.huntarr.service=huntarr
-      - traefik.http.routers.huntarr.rule=Host(`huntarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.huntarr.entrypoints=secureweb
-      - traefik.http.routers.huntarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.huntarr.loadbalancer.server.scheme=http
-      - traefik.http.services.huntarr.loadbalancer.server.port=9705
     # MIDDLEWARES
 
 ###########################################################################
@@ -277,45 +163,6 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Lidarr (LinuxServer.io)
-##  Function: Music Library Manager
-##
-##  Documentation: https://docs.linuxserver.io/images/docker-lidarr
-##
-###########################################################################
-###########################################################################
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
-    restart: unless-stopped
-    volumes:
-      - ${FOLDER_FOR_MEDIA:?err}:/data
-      - ${FOLDER_FOR_DATA:?err}/lidarr:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - TZ=${TIMEZONE:?err}
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:lidarr
-      - TP_THEME=${TP_THEME:?err}
-    ports:
-      - "${WEBUI_PORT_LIDARR}:8686"
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.lidarr.service=lidarr
-      - traefik.http.routers.lidarr.rule=Host(`lidarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.lidarr.entrypoints=secureweb
-      - traefik.http.routers.lidarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.lidarr.loadbalancer.server.scheme=http
-      - traefik.http.services.lidarr.loadbalancer.server.port=8686
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
 ##  Docker Compose File: Plex (LinuxServer.io)
 ##  Function: Media Server
 ##
@@ -365,40 +212,6 @@ services:
     # SERVICES
       - traefik.http.services.plex.loadbalancer.server.scheme=http
       - traefik.http.services.plex.loadbalancer.server.port=32400
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
-##  Docker Compose File: Portainer (Portainer.io)
-##  Function: Alternate GUI Manager for Docker
-##
-##  Documentation: https://docs.portainer.io/start/install/server/docker
-##
-###########################################################################
-###########################################################################
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${FOLDER_FOR_DATA:?err}/portainer:/data
-    ports:
-      - ${WEBUI_PORT_PORTAINER:?err}:9000
-      - "9443:9443"
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.portainer.service=portainer
-      - traefik.http.routers.portainer.rule=Host(`portainer.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.portainer.entrypoints=secureweb
-      - traefik.http.routers.portainer.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.portainer.loadbalancer.server.scheme=http
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
     # MIDDLEWARES
 
 ###########################################################################
