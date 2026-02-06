@@ -253,7 +253,7 @@ services:
 #      - /dev/dri/renderD128:/dev/dri/renderD128
 #      - /dev/dri/card0:/dev/dri/card0
     volumes:
-      - ${FOLDER_FOR_MEDIA:?err}/media:/data/media
+      - ${FOLDER_FOR_MEDIA:?err}/data/media
       - ${FOLDER_FOR_DATA:?err}/jellyfin:/config
     environment:
       - PUID=${PUID:?err}
@@ -375,7 +375,7 @@ services:
     networks:
       - mediastack
     volumes:
-      - ${FOLDER_FOR_MEDIA:?err}/media:/data/media
+      - ${FOLDER_FOR_MEDIA:?err}/data/media
       - ${FOLDER_FOR_DATA:?err}/plex:/config
     environment:
       - PUID=${PUID:?err}
