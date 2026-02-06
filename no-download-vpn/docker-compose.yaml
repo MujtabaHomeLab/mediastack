@@ -981,43 +981,6 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Mylar3 (LinuxServer.io)
-##  Function: Comic Library Manager
-##
-##  Documentation: https://github.com/mylar3/mylar3/wiki
-##
-###########################################################################
-###########################################################################
-  mylar:
-    image: lscr.io/linuxserver/mylar3:latest
-    container_name: mylar
-    restart: unless-stopped
-    volumes:
-      - ${FOLDER_FOR_MEDIA:?err}:/data
-      - ${FOLDER_FOR_DATA:?err}/mylar:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - TZ=${TIMEZONE:?err}
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:mylar3
-      - TP_THEME=${TP_THEME:?err}
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.mylar.service=mylar
-      - traefik.http.routers.mylar.rule=Host(`mylar.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.mylar.entrypoints=secureweb
-      - traefik.http.routers.mylar.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.mylar.loadbalancer.server.scheme=http
-      - traefik.http.services.mylar.loadbalancer.server.port=8090
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
 ##  Docker Compose File: Plex (LinuxServer.io)
 ##  Function: Media Server
 ##
@@ -1201,43 +1164,6 @@ services:
     # SERVICES
       - traefik.http.services.radarr.loadbalancer.server.scheme=http
       - traefik.http.services.radarr.loadbalancer.server.port=7878
-    # MIDDLEWARES
-
-###########################################################################
-###########################################################################
-##
-##  Docker Compose File: Readarr (LinuxServer.io)
-##  Function: Book Library Manager
-##
-##  Documentation: https://docs.linuxserver.io/images/docker-readarr
-##
-###########################################################################
-###########################################################################
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
-    restart: unless-stopped
-    volumes:
-      - ${FOLDER_FOR_MEDIA:?err}:/data
-      - ${FOLDER_FOR_DATA:?err}/readarr:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - TZ=${TIMEZONE:?err}
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:readarr
-      - TP_THEME=${TP_THEME:?err}
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.readarr.service=readarr
-      - traefik.http.routers.readarr.rule=Host(`readarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.readarr.entrypoints=secureweb
-      - traefik.http.routers.readarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.readarr.loadbalancer.server.scheme=http
-      - traefik.http.services.readarr.loadbalancer.server.port=8787
     # MIDDLEWARES
 
 ###########################################################################
@@ -1438,16 +1364,6 @@ services:
       ## Folder Settings
       - UN_FOLDERS_INTERVAL=1s
       - UN_FOLDERS_BUFFER=20000
-      ## Mylar Settings
-      ## Mylar Config - Copy API Key from: http://mylar:8090/general/settings
-      - UN_MYLAR_0_URL=http://mylar:8090
-      - UN_MYLAR_0_API_KEY=0123456789abcdef0123456789abcdef
-      - UN_MYLAR_0_PATHS_0=/data/torrents/comics
-      - UN_MYLAR_0_PROTOCOLS=torrent
-      - UN_MYLAR_0_TIMEOUT=10s
-      - UN_MYLAR_0_DELETE_DELAY=5m
-      - UN_MYLAR_0_DELETE_ORIG=false
-      - UN_MYLAR_0_SYNCTHING=false
       ## Sonarr Settings
       ## Sonarr Config - Copy API Key from: http://sonarr:8989/general/settings
       - UN_SONARR_0_URL=http://sonarr:8989
@@ -1479,26 +1395,6 @@ services:
       - UN_LIDARR_0_DELETE_DELAY=5m
       - UN_LIDARR_0_DELETE_ORIG=false
       - UN_LIDARR_0_SYNCTHING=false
-      ## Readarr Settings
-      ## Readarr Config - Copy API Key from: http://readarr:8787/general/settings
-      - UN_READARR_0_URL=http://readarr:8787
-      - UN_READARR_0_API_KEY=0123456789abcdef0123456789abcdef
-      - UN_READARR_0_PATHS_0=/data/torrents/books
-      - UN_READARR_0_PROTOCOLS=torrent
-      - UN_READARR_0_TIMEOUT=10s
-      - UN_READARR_0_DELETE_DELAY=5m
-      - UN_READARR_0_DELETE_ORIG=false
-      - UN_READARR_0_SYNCTHING=false
-      ## Whisparr Settings
-      ## Whisparr Config - Copy API Key from: http://readarr:6969/general/settings
-      - UN_WHISPARR_0_URL=http://whisparr:6969
-      - UN_WHISPARR_0_API_KEY=0123456789abcdef0123456789abcdef
-      - UN_WHISPARR_0_PATHS_0=/data/torrents/xxx
-      - UN_WHISPARR_0_PROTOCOLS=torrent
-      - UN_WHISPARR_0_TIMEOUT=10s
-      - UN_WHISPARR_0_DELETE_DELAY=5m
-      - UN_WHISPARR_0_DELETE_ORIG=false
-      - UN_WHISPARR_0_SYNCTHING=false
       ## Watch Folders
       - UN_FOLDER_0_PATH=/data/torrents/complete
       - UN_FOLDER_0_EXTRACT_PATH=
@@ -1536,39 +1432,3 @@ services:
       - UN_CMDHOOK_0_EXCLUDE_0=readarr
       - UN_CMDHOOK_0_EXCLUDE_1=lidarr
       - UN_CMDHOOK_0_TIMEOUT=10s
-
-###########################################################################
-###########################################################################
-##
-##  Docker Compose File: Whisparr (Hotio.Dev)
-##  Function: Adult Media Library Manager
-##
-##  Documentation: https://wiki.servarr.com/whisparr
-##
-###########################################################################
-###########################################################################
-  whisparr:
-    image: hotio/whisparr:nightly
-    container_name: whisparr
-    restart: unless-stopped
-    volumes:
-      - ${FOLDER_FOR_MEDIA:?err}:/data
-      - ${FOLDER_FOR_DATA:?err}/whisparr:/config
-    environment:
-      - PUID=${PUID:?err}
-      - PGID=${PGID:?err}
-      - UMASK=${UMASK:?err}
-      - TZ=${TIMEZONE:?err}
-    networks:
-      - mediastack
-    labels:
-      - traefik.enable=true
-    # ROUTERS
-      - traefik.http.routers.whisparr.service=whisparr
-      - traefik.http.routers.whisparr.rule=Host(`whisparr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.whisparr.entrypoints=secureweb
-      - traefik.http.routers.whisparr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
-    # SERVICES
-      - traefik.http.services.whisparr.loadbalancer.server.scheme=http
-      - traefik.http.services.whisparr.loadbalancer.server.port=6969
-    # MIDDLEWARES
