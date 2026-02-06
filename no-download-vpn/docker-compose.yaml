@@ -427,7 +427,7 @@ services:
       - ${FOLDER_FOR_DATA:?err}/portainer:/data
     ports:
       - ${WEBUI_PORT_PORTAINER:?err}:9000
-        - "9443:9443"
+      - "9443:9443"
     networks:
       - mediastack
     labels:
