@@ -416,7 +416,7 @@ services:
 ###########################################################################
 ###########################################################################
   overseerr:
-    image: sct/overseerr:latest
+    image: sctx/overseerr:latest
     container_name: overseerr
     restart: unless-stopped
     networks:
