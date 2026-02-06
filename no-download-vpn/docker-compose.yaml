@@ -508,7 +508,7 @@ services:
     ports:
       - "${WEBUI_PORT_QBITTORRENT}:8080"
       - "${QBIT_PORT}:6881"
-      - "${QBIT_PORT}:6881/udp
+      - "${QBIT_PORT}:6881/udp"
     networks:
       - mediastack
     labels:
