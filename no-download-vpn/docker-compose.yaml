@@ -481,39 +481,37 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Prowlarr (LinuxServer.io)
-##  Function: Indexer and Search Manager
+##  Docker Compose File: Pulsarr (lakker/pulsarr)
+##  Function: Real-time Plex Watchlist Integration
 ##
-##  Documentation: https://docs.linuxserver.io/images/docker-prowlarr
+##  Documentation: https://jamcalli.github.io/Pulsarr/
 ##
 ###########################################################################
 ###########################################################################
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
+  pulsarr:
+    image: lakker/pulsarr:latest
+    container_name: pulsarr
     restart: unless-stopped
+    networks:
+      - mediastack
     volumes:
-      - ${FOLDER_FOR_DATA:?err}/prowlarr:/config
+      - ${FOLDER_FOR_DATA:?err}/pulsarr:/app/data
     environment:
       - PUID=${PUID:?err}
       - PGID=${PGID:?err}
       - TZ=${TIMEZONE:?err}
-      - DOCKER_MODS=ghcr.io/themepark-dev/theme.park:prowlarr
-      - TP_THEME=${TP_THEME:?err}
     ports:
-      - "${WEBUI_PORT_PROWLARR}:9696"
-    networks:
-      - mediastack
+      - "${WEBUI_PORT_PULSARR}:3003"
     labels:
       - traefik.enable=true
     # ROUTERS
-      - traefik.http.routers.prowlarr.service=prowlarr
-      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${CLOUDFLARE_DNS_ZONE:?err}`)
-      - traefik.http.routers.prowlarr.entrypoints=secureweb
-      - traefik.http.routers.prowlarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
+      - traefik.http.routers.pulsarr.service=pulsarr
+      - traefik.http.routers.pulsarr.rule=Host(`pulsarr.${CLOUDFLARE_DNS_ZONE:?err}`)
+      - traefik.http.routers.pulsarr.entrypoints=secureweb
+      - traefik.http.routers.pulsarr.middlewares=authentik-forwardauth@file,security-headers@file,traefik-bouncer@file
     # SERVICES
-      - traefik.http.services.prowlarr.loadbalancer.server.scheme=http
-      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+      - traefik.http.services.pulsarr.loadbalancer.server.scheme=http
+      - traefik.http.services.pulsarr.loadbalancer.server.port=3003
 
 ###########################################################################
 ###########################################################################
