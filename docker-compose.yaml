@@ -307,7 +307,7 @@ services:
 ###########################################################################
 ###########################################################################
   jellyplex-watched:
-    image: luigi311/jellyplex-watched:latest
+    image: ghcr.io/luigi311/jellyplex-watched:latest
     container_name: jellyplex-watched
     restart: unless-stopped
     networks:
