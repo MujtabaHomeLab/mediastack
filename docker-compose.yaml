@@ -295,3 +295,28 @@ services:
       - TZ=${TIMEZONE:?err}
     ports:
       - "${WEBUI_PORT_PULSARR}:3003"
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: JellyPlex-Watched (luigi311)
+##  Function: Sync watched history between Plex and Jellyfin (and Emby if used)
+##
+##  Documentation: https://github.com/luigi311/JellyPlex-Watched
+##
+###########################################################################
+###########################################################################
+  jellyplex-watched:
+    image: luigi311/jellyplex-watched:latest
+    container_name: jellyplex-watched
+    restart: unless-stopped
+    networks:
+      - mediastack
+    depends_on:
+      - plex
+      - jellyfin
+    volumes:
+      - ./mediastack/appdata/jellyplex-watched/jellyplex.env:/app/.env:ro
+      - ./mediastack/appdata/jellyplex-watched:/config
+    environment:
+      - TZ=${TIMEZONE:?err}
