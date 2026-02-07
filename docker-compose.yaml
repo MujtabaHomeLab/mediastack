@@ -1,0 +1,297 @@
+###########################################################################
+###########################################################################
+networks:
+  mediastack:
+    name: mediastack
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: ${DOCKER_SUBNET:?err}
+        gateway: ${DOCKER_GATEWAY:?err}
+###########################################################################
+###########################################################################
+services:
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Tailscale
+##  Function: Tailscale Client - Operating as Tailnet Exit-Node
+##
+##  Documentation: https://headscale.net/stable/
+##
+###########################################################################
+###########################################################################
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: mediastack
+    container_name: tailscale
+    restart: unless-stopped
+    networks:
+      - mediastack
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./mediastack/appdata/tailscale:/var/lib/tailscale
+    environment:
+      - TS_USERSPACE=false
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY:?err}
+      - TS_EXTRA_ARGS=--hostname=mediastack --advertise-exit-node --advertise-routes=${LOCAL_SUBNET:?err},${DOCKER_SUBNET:?err}
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Flaresolverr (Flaresolverr)
+##  Function: Cloudflare Proxy Server
+##
+##  Documentation: https://github.com/FlareSolverr/FlareSolverr
+##
+###########################################################################
+###########################################################################
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${FLARESOLVERR_PORT}:8191"
+    networks:
+      - mediastack
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Jellyfin (LinuxServer.io)
+##  Function: Media Server
+##
+##  Documentation: https://jellyfin.org/docs/general/administration/installing#docker
+##  https://jellyfin.org/docs/general/administration/hardware-acceleration/
+##
+###########################################################################
+###########################################################################
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/movies:/data/media/movies
+      - ./mediastack/tv:/data/media/tv
+      - ./mediastack/appdata/jellyfin:/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - UMASK=${UMASK:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_JELLYFIN}:8096"
+      - "8920:8920"
+    networks:
+      - mediastack
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Plex (LinuxServer.io)
+##  Function: Media Server
+##
+##  Documentation: https://hub.docker.com/r/linuxserver/plex
+##
+###########################################################################
+###########################################################################
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/movies:/data/media/movies
+      - ./mediastack/tv:/data/media/tv
+      - ./mediastack/appdata/plex:/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - UMASK=${UMASK:?err}
+      - TZ=${TIMEZONE:?err}
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM}
+    ports:
+      - "${WEBUI_PORT_PLEX}:32400"
+      - "1900:1900/udp"
+      - "5353:5353/udp"
+      - "8324:8324"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "32469:32469"
+    networks:
+      - mediastack
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Prowlarr (LinuxServer.io)
+##  Function: Indexer and Search Manager
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-prowlarr
+##
+###########################################################################
+###########################################################################
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/appdata/prowlarr:/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_PROWLARR}:9696"
+    networks:
+      - mediastack
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: qBittorrent (LinuxServer.io)
+##  Function: Torrent Download Client
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-qbittorrent
+##
+###########################################################################
+###########################################################################
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/appdata/qbittorrent:/config
+      - ./mediastack/downloads:/downloads
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - UMASK=${UMASK:?err}
+      - TZ=${TIMEZONE:?err}
+      - WEBUI_PORT=8080
+    ports:
+      - "${WEBUI_PORT_QBITTORRENT}:8080"
+      - "${QBIT_PORT}:6881"
+      - "${QBIT_PORT}:6881/udp"
+    networks:
+      - mediastack
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Radarr (LinuxServer.io)
+##  Function: Movie Library Manager
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-radarr
+##
+###########################################################################
+###########################################################################
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/appdata/radarr:/config
+      - ./mediastack/downloads:/downloads
+      - ./mediastack/movies:/movies
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_RADARR}:7878"
+    networks:
+      - mediastack
+    depends_on:
+      - qbittorrent
+      - prowlarr
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Sonarr (LinuxServer.io)
+##  Function: Series Library Manager (TV Shows)
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-sonarr
+##
+###########################################################################
+###########################################################################
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/appdata/sonarr:/config
+      - ./mediastack/downloads:/downloads
+      - ./mediastack/tv:/tv
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_SONARR}:8989"
+    networks:
+      - mediastack
+    depends_on:
+      - qbittorrent
+      - prowlarr
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Overseerr (sabeas)
+##  Function: Request Management & Discovery (Plex focused)
+##
+##  Documentation: https://docs.overseerr.dev/getting-started/installation
+##
+###########################################################################
+###########################################################################
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    restart: unless-stopped
+    networks:
+      - mediastack
+    volumes:
+      - ./mediastack/appdata/overseerr:/app/config
+    environment:
+      - TZ=${TIMEZONE:?err}
+      - LOG_LEVEL=info
+    ports:
+      - "${WEBUI_PORT_OVERSEERR}:5055"
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Pulsarr (lakker/pulsarr)
+##  Function: Real-time Plex Watchlist Integration
+##
+##  Documentation: https://jamcalli.github.io/Pulsarr/
+##
+###########################################################################
+###########################################################################
+  pulsarr:
+    image: lakker/pulsarr:latest
+    container_name: pulsarr
+    restart: unless-stopped
+    networks:
+      - mediastack
+    volumes:
+      - ./mediastack/appdata/pulsarr:/app/data
+    environment:
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_PULSARR}:3003"
