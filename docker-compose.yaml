@@ -316,7 +316,26 @@ services:
       - plex
       - jellyfin
     volumes:
-      - ./mediastack/appdata/jellyplex-watched/jellyplex.env:/app/.env:ro
       - ./mediastack/appdata/jellyplex-watched:/config
     environment:
       - TZ=${TIMEZONE:?err}
+      - DRYRUN=${JPW_DRYRUN:?err}
+      - DEBUG_LEVEL=${JPW_DEBUG_LEVEL:?err}
+      - RUN_ONLY_ONCE=${JPW_RUN_ONLY_ONCE:?err}
+      - SLEEP_DURATION=${JPW_SLEEP_DURATION:?err}
+      - LOG_FILE=${JPW_LOG_FILE:?err}
+      - MARK_FILE=${JPW_MARK_FILE:?err}
+      - REQUEST_TIMEOUT=${JPW_REQUEST_TIMEOUT:?err}
+      - MAX_THREADS=${JPW_MAX_THREADS:?err}
+      - GENERATE_GUIDS=${JPW_GENERATE_GUIDS:?err}
+      - GENERATE_LOCATIONS=${JPW_GENERATE_LOCATIONS:?err}
+      - SSL_BYPASS=${JPW_SSL_BYPASS:?err}
+
+      - PLEX_BASEURL=${JPW_PLEX_BASEURL:?err}
+      - PLEX_TOKEN=${JPW_PLEX_TOKEN:?err}
+
+      - JELLYFIN_BASEURL=${JPW_JELLYFIN_BASEURL:?err}
+      - JELLYFIN_TOKEN=${JPW_JELLYFIN_TOKEN:?err}
+
+      - SYNC_FROM_PLEX_TO_JELLYFIN=${JPW_SYNC_FROM_PLEX_TO_JELLYFIN:?err}
+      - SYNC_FROM_JELLYFIN_TO_PLEX=${JPW_SYNC_FROM_JELLYFIN_TO_PLEX:?err}
