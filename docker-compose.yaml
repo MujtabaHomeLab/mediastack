@@ -295,3 +295,33 @@ services:
       - TZ=${TIMEZONE:?err}
     ports:
       - "${WEBUI_PORT_PULSARR}:3003"
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Bazarr (LinuxServer.io)
+##  Function: Subtitle Management (integrates with Sonarr/Radarr)
+##
+##  Documentation: https://docs.linuxserver.io/images/docker-bazarr
+##
+###########################################################################
+###########################################################################
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    volumes:
+      - ./mediastack/appdata/bazarr:/config
+      - ./mediastack/movies:/movies
+      - ./mediastack/tv:/tv
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_BAZARR}:6767"
+    networks:
+      - mediastack
+    depends_on:
+      - radarr
+      - sonarr
