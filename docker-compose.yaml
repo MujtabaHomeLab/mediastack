@@ -252,30 +252,6 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Overseerr (sabeas)
-##  Function: Request Management & Discovery (Plex focused)
-##
-##  Documentation: https://docs.overseerr.dev/getting-started/installation
-##
-###########################################################################
-###########################################################################
-  overseerr:
-    image: sctx/overseerr:latest
-    container_name: overseerr
-    restart: unless-stopped
-    networks:
-      - mediastack
-    volumes:
-      - ./mediastack/appdata/overseerr:/app/config
-    environment:
-      - TZ=${TIMEZONE:?err}
-      - LOG_LEVEL=info
-    ports:
-      - "${WEBUI_PORT_OVERSEERR}:5055"
-
-###########################################################################
-###########################################################################
-##
 ##  Docker Compose File: Pulsarr (lakker/pulsarr)
 ##  Function: Real-time Plex Watchlist Integration
 ##
@@ -348,3 +324,27 @@ services:
       - TZ=${TIMEZONE:?err}
     ports:
       - "${WEBUI_PORT_PROFILARR}:6868"
+
+###########################################################################
+###########################################################################
+##
+##  Docker Compose File: Seerr
+##  Function: Media request management (Sonarr/Radarr frontend)
+##
+###########################################################################
+###########################################################################
+  seerr:
+    container_name: seerr
+    image: ghcr.io/sct/seerr:latest
+    restart: unless-stopped
+    networks:
+      - mediastack
+    volumes:
+      - ./mediastack/appdata/seerr:/app/config
+    environment:
+      - PUID=${PUID:?err}
+      - PGID=${PGID:?err}
+      - TZ=${TIMEZONE:?err}
+    ports:
+      - "${WEBUI_PORT_SEERR}:5055"
+
