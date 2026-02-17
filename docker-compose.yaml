@@ -335,7 +335,7 @@ services:
 ###########################################################################
   seerr:
     container_name: seerr
-    image: ghcr.io/sct/seerr:latest
+    image: ghcr.io/seerr-team/seerr:latest
     restart: unless-stopped
     networks:
       - mediastack
