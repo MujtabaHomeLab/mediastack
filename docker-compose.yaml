@@ -329,16 +329,14 @@ services:
 ###########################################################################
 ###########################################################################
 ##
-##  Docker Compose File: Profilarr (Dictionarry Hub)
+##  Docker Compose File: Profilarr (with Parser)
 ##  Function: Quality Profile Manager for Sonarr/Radarr
-##
-##  Documentation: https://github.com/Dictionarry-Hub/profilarr
 ##
 ###########################################################################
 ###########################################################################
   profilarr:
-    image: ghcr.io/dictionarry-hub/profilarr:latest
     container_name: profilarr
+    image: ghcr.io/dictionarry-hub/profilarr:latest
     restart: unless-stopped
     networks:
       - mediastack
@@ -355,3 +353,12 @@ services:
     depends_on:
       parser:
         condition: service_healthy
+
+  parser:
+    container_name: profilarr-parser
+    image: ghcr.io/dictionarry-hub/profilarr-parser:latest
+    restart: unless-stopped
+    networks:
+      - mediastack
+    expose:
+      - "5000"
