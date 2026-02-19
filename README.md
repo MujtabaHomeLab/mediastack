@@ -97,6 +97,79 @@ All containers run on a dedicated Docker bridge network (`mediastack`, default s
 
 Tailscale is configured as an exit node and advertises both your LAN subnet and the Docker subnet, so you can reach everything remotely without opening firewall ports.
 
+## Initial Configuration
+
+After the stack is up, a few services need manual first-time setup. Do these in order.
+
+---
+
+### 1. Plex — Claim your server
+
+Get a claim token from [plex.tv/claim](https://plex.tv/claim) (it expires in 4 minutes, so have your editor ready).
+
+Add it to your `.env`:
+
+```env
+PLEX_CLAIM=claim-xxxxxxxxxxxxxxxxxxxx
+```
+
+Then force-recreate the Plex container to apply it:
+
+```bash
+docker compose up -d --force-recreate plex
+```
+
+---
+
+### 2. FlareSolverr — Connect to Prowlarr
+
+FlareSolverr is a Cloudflare bypass proxy used by Prowlarr to access protected indexers.
+
+1. Open Prowlarr → **Settings → Indexers**
+2. Add a FlareSolverr proxy with the URL: `http://flaresolverr:8191`
+3. Assign it the tag `cf`
+4. When adding a Cloudflare-protected indexer (e.g. 1337x), apply the `cf` tag to it so Prowlarr routes requests through FlareSolverr automatically
+
+---
+
+### 3. Sonarr & Radarr — Set root folders
+
+This must be done before configuring Pulsarr, otherwise Pulsarr won't be able to list root folders.
+
+**In Sonarr** → Settings → Media Management → Root Folders → Add:
+
+```
+/tv
+```
+
+**In Radarr** → Settings → Media Management → Root Folders → Add:
+
+```
+/movies
+```
+
+These paths match the volume mounts defined in the Compose file. You can verify they exist inside the containers:
+
+```bash
+docker compose exec sonarr ls -la /tv
+docker compose exec radarr ls -la /movies
+```
+
+---
+
+### 4. Pulsarr — Connect to Sonarr & Radarr
+
+When configuring service URLs inside Pulsarr, use Docker service names rather than your LAN IP. This is more reliable and avoids issues if your host IP changes:
+
+| Service | Internal URL |
+|---|---|
+| Sonarr | `http://sonarr:8989` |
+| Radarr | `http://radarr:7878` |
+
+Once Sonarr and Radarr have their root folders set (step 3), hit **Test** in Pulsarr and the root folder dropdowns should populate — `/tv` for Sonarr and `/movies` for Radarr.
+
+---
+
 ## Notes
 
 - Sonarr and Radarr both depend on qBittorrent and Prowlarr being up before they start.
